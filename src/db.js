@@ -1,6 +1,6 @@
 // src/db.js
-import pg from 'pg';
-import dotenv from 'dotenv';
+const pg = require('pg');
+const dotenv = require('dotenv');
 
 dotenv.config();
 
@@ -10,7 +10,6 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
-// Optional: simple test function to verify connection
 async function testConnection() {
   try {
     const client = await pool.connect();
@@ -23,4 +22,4 @@ async function testConnection() {
 
 testConnection();
 
-export default pool;
+module.exports = pool;
