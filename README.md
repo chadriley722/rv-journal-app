@@ -1,84 +1,75 @@
-# RV Journal Web Application
+# RV Journal App
 
 A web application for RV enthusiasts to track their journeys and experiences.
 
-## Features
+## Project Structure
 
-- User authentication (register/login)
-- Create and manage journal entries
-- Track RV locations and experiences
-- Secure API endpoints with JWT authentication
+- **backend/**: Node.js/Express backend with PostgreSQL database.
+  - **src/**: Source code for the backend.
+  - **drizzle/**: Database migrations and schema.
+  - **package.json**: Backend dependencies and scripts.
 
-## Tech Stack
+- **frontend/**: React + TypeScript frontend built with Vite.
+  - **src/**: Source code for the frontend.
+  - **public/**: Static assets.
+  - **package.json**: Frontend dependencies and scripts.
 
-- TypeScript
-- Express.js
-- PostgreSQL
-- Drizzle ORM
-- JWT for authentication
+## Getting Started
 
-## Prerequisites
+### Backend
 
-- Node.js (v14 or higher)
-- PostgreSQL (v12 or higher)
-
-## Setup
-
-1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/rv-journal-app.git
-cd rv-journal-app
-```
+1. Navigate to the backend directory:
+   ```bash
+   cd backend
+   ```
 
 2. Install dependencies:
-```bash
-npm install
-```
+   ```bash
+   npm install
+   ```
 
-3. Create a `.env` file in the root directory with the following variables:
-```
-PORT=3000
-DB_USER=postgres
-DB_HOST=localhost
-DB_NAME=rv_journal
-DB_PASSWORD=your_password
-DB_PORT=5432
-JWT_SECRET=your-secret-key
-```
+3. Set up your `.env` file with the following variables:
+   ```
+   DB_USER=your_db_user
+   DB_HOST=localhost
+   DB_NAME=rv_journal_dev
+   DB_PASSWORD=your_db_password
+   DB_PORT=5432
+   JWT_SECRET=your_jwt_secret
+   PORT=3000
+   ```
 
-4. Create the database:
-```bash
-createdb rv_journal
-```
+4. Run the development server:
+   ```bash
+   npm run dev
+   ```
 
-5. Run migrations:
-```bash
-npm run migrate
-```
+### Frontend
 
-6. Start the development server:
-```bash
-npm run dev
-```
+1. Navigate to the frontend directory:
+   ```bash
+   cd frontend
+   ```
 
-## API Endpoints
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-### Authentication
+3. Run the development server:
+   ```bash
+   npm run dev
+   ```
 
-- `POST /api/auth/register` - Register a new user
-- `POST /api/auth/login` - Login user
+## Features
 
-### Journal Entries
-
-- `GET /api/journal` - Get all journal entries
-- `POST /api/journal` - Create a new journal entry
-- `GET /api/journal/:id` - Get a specific journal entry
-- `PUT /api/journal/:id` - Update a journal entry
-- `DELETE /api/journal/:id` - Delete a journal entry
+- User registration and login
+- Journal entry management (create, read, update, delete)
+- Protected routes with JWT authentication
 
 ## License
 
-This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the GPL-3.0 License.
 
 The GNU GPL is a free, copyleft license that ensures the software remains free and open source. This means:
 
