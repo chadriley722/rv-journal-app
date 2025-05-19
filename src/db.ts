@@ -1,14 +1,15 @@
-// src/db.js
-const pg = require('pg');
-const dotenv = require('dotenv');
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { Pool } from 'pg';
+import * as schema from './schema';
+import dotenv from 'dotenv';
 
 dotenv.config();
-
-const { Pool } = pg;
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
+
+export const db = drizzle(pool, { schema });
 
 async function testConnection() {
   try {
@@ -22,4 +23,4 @@ async function testConnection() {
 
 testConnection();
 
-module.exports = pool;
+export default db; 
