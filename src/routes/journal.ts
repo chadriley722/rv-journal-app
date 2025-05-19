@@ -28,14 +28,16 @@ router.get('/', auth, async (req: AuthRequest, res) => {
 router.post('/', auth, async (req: AuthRequest, res) => {
   try {
     const { title, content, location } = req.body;
+    const entry_text = `${title}\n\n${content}${location ? `\n\nLocation: ${location}` : ''}`;
+    
     const result = await pool.query(
-      'INSERT INTO journal_entries (user_id, title, content, location) VALUES ($1, $2, $3, $4) RETURNING *',
-      [req.user?.userId, title, content, location]
+      'INSERT INTO journal_entries (user_id, entry_text) VALUES ($1, $2) RETURNING *',
+      [req.user?.userId, entry_text]
     );
     res.status(201).json(result.rows[0]);
   } catch (error) {
     console.error('Error creating journal entry:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error: error instanceof Error ? error.message : 'Unknown error' });
   }
 });
 
@@ -62,9 +64,11 @@ router.get('/:id', auth, async (req: AuthRequest, res) => {
 router.put('/:id', auth, async (req: AuthRequest, res) => {
   try {
     const { title, content, location } = req.body;
+    const entry_text = `${title}\n\n${content}${location ? `\n\nLocation: ${location}` : ''}`;
+    
     const result = await pool.query(
-      'UPDATE journal_entries SET title = $1, content = $2, location = $3, updated_at = NOW() WHERE id = $4 AND user_id = $5 RETURNING *',
-      [title, content, location, req.params.id, req.user?.userId]
+      'UPDATE journal_entries SET entry_text = $1 WHERE id = $2 AND user_id = $3 RETURNING *',
+      [entry_text, req.params.id, req.user?.userId]
     );
 
     if (result.rows.length === 0) {
@@ -74,7 +78,7 @@ router.put('/:id', auth, async (req: AuthRequest, res) => {
     res.json(result.rows[0]);
   } catch (error) {
     console.error('Error updating journal entry:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error', error: error instanceof Error ? error.message : 'Unknown error' });
   }
 });
 
