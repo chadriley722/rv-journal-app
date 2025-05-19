@@ -1,113 +1,80 @@
 # RV Journal Web Application
 
-A web application for RV enthusiasts to track their journeys and experiences. Built with TypeScript, Express, and PostgreSQL.
+A web application for RV enthusiasts to track their journeys and experiences.
 
 ## Features
 
-- User authentication and authorization
-- Journal entry creation and management
-- Location tracking
-- Photo uploads
-- Social sharing
+- User authentication (register/login)
+- Create and manage journal entries
+- Track RV locations and experiences
+- Secure API endpoints with JWT authentication
 
 ## Tech Stack
 
-- **Backend**: Node.js, Express, TypeScript
-- **Database**: PostgreSQL
-- **Authentication**: JWT
-- **Testing**: Jest
-- **API Documentation**: Swagger/OpenAPI
+- TypeScript
+- Express.js
+- PostgreSQL
+- Drizzle ORM
+- JWT for authentication
 
-## Getting Started
+## Prerequisites
 
-### Prerequisites
+- Node.js (v14 or higher)
+- PostgreSQL (v12 or higher)
 
-- Node.js (v18 or higher)
-- PostgreSQL (v14 or higher)
-- npm or yarn
-
-### Installation
+## Setup
 
 1. Clone the repository:
-   ```bash
-   git clone https://github.com/chadriley722/rv-journal-app.git
-   cd rv-journal-app
-   ```
+```bash
+git clone https://github.com/yourusername/rv-journal-app.git
+cd rv-journal-app
+```
 
 2. Install dependencies:
-   ```bash
-   npm install
-   ```
+```bash
+npm install
+```
 
 3. Create a `.env` file in the root directory with the following variables:
-   ```
-   DATABASE_URL=postgresql://username:password@localhost:5432/rv_journal
-   JWT_SECRET=your_jwt_secret
-   PORT=3000
-   ```
+```
+PORT=3000
+DB_USER=postgres
+DB_HOST=localhost
+DB_NAME=rv_journal
+DB_PASSWORD=your_password
+DB_PORT=5432
+JWT_SECRET=your-secret-key
+```
 
-4. Run database migrations:
-   ```bash
-   npm run migrate up
-   ```
+4. Create the database:
+```bash
+createdb rv_journal
+```
 
-5. Start the development server:
-   ```bash
-   npm run dev
-   ```
+5. Run migrations:
+```bash
+npm run migrate
+```
 
-The server will start on http://localhost:3000
+6. Start the development server:
+```bash
+npm run dev
+```
 
 ## API Endpoints
 
 ### Authentication
+
 - `POST /api/auth/register` - Register a new user
 - `POST /api/auth/login` - Login user
-- `GET /api/auth/me` - Get current user
 
 ### Journal Entries
-- `GET /api/entries` - Get all entries
-- `POST /api/entries` - Create new entry
-- `GET /api/entries/:id` - Get entry by ID
-- `PUT /api/entries/:id` - Update entry
-- `DELETE /api/entries/:id` - Delete entry
 
-## Development
-
-### Available Scripts
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm start` - Start production server
-- `npm test` - Run tests
-- `npm run lint` - Run linter
-- `npm run migrate` - Run database migrations
-
-### Project Structure
-
-```
-rv-journal-app/
-├── src/
-│   ├── config/         # Configuration files
-│   ├── controllers/    # Route controllers
-│   ├── middleware/     # Custom middleware
-│   ├── models/         # Database models
-│   ├── routes/         # API routes
-│   ├── types/          # TypeScript types
-│   ├── utils/          # Utility functions
-│   └── app.ts          # Application entry point
-├── tests/              # Test files
-├── migrations/         # Database migrations
-└── package.json
-```
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+- `GET /api/journal` - Get all journal entries
+- `POST /api/journal` - Create a new journal entry
+- `GET /api/journal/:id` - Get a specific journal entry
+- `PUT /api/journal/:id` - Update a journal entry
+- `DELETE /api/journal/:id` - Delete a journal entry
 
 ## License
 

@@ -1,19 +1,23 @@
-import { pgTable, serial, varchar, timestamp, text, integer } from 'drizzle-orm/pg-core';
+import { pgTable, serial, text, timestamp, integer } from 'drizzle-orm/pg-core';
 
 // Users table schema
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
-  username: varchar('username', { length: 50 }).notNull().unique(),
-  email: varchar('email', { length: 100 }).notNull().unique(),
-  password_hash: varchar('password_hash', { length: 255 }).notNull(),
-  created_at: timestamp('created_at').defaultNow(),
+  email: text('email').notNull().unique(),
+  password: text('password').notNull(),
+  name: text('name').notNull(),
+  created_at: timestamp('created_at').defaultNow().notNull(),
+  updated_at: timestamp('updated_at').defaultNow().notNull(),
 });
 
 // Journal entries table schema
 export const journal_entries = pgTable('journal_entries', {
-    id: serial('id').primaryKey(),
-    user_id: integer('user_id').notNull().references(() => users.id),
-    entry_text: text('entry_text').notNull(),
-    created_at: timestamp('created_at').defaultNow(),
-  });
+  id: serial('id').primaryKey(),
+  user_id: integer('user_id').references(() => users.id).notNull(),
+  title: text('title').notNull(),
+  content: text('content').notNull(),
+  location: text('location'),
+  created_at: timestamp('created_at').defaultNow().notNull(),
+  updated_at: timestamp('updated_at').defaultNow().notNull(),
+});
   
