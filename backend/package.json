@@ -7,7 +7,7 @@
     "start": "node dist/app.js",
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
     "build": "tsc",
-    "migrate": "psql -d rv_journal -f drizzle/0000_initial.sql",
+    "migrate": "psql -d rv_journal_dev -f drizzle/0003_recreate_users.sql",
     "test": "jest"
   },
   "repository": {

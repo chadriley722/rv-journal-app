@@ -1,23 +1,19 @@
-import express, { Request } from 'express';
-import { auth } from '../middleware/auth';
-import { pool } from '../db';
-
-interface AuthRequest extends Request {
-  user?: {
-    userId: number;
-  };
-}
+import express from 'express';
+import { authenticateToken } from '../middleware/auth';
+import { db } from '../db';
+import { journal_entries } from '../schema';
+import { eq } from 'drizzle-orm';
 
 const router = express.Router();
 
 // Get all journal entries
-router.get('/', auth, async (req: AuthRequest, res) => {
+router.get('/', authenticateToken, async (req, res) => {
   try {
-    const result = await pool.query(
-      'SELECT * FROM journal_entries WHERE user_id = $1 ORDER BY created_at DESC',
-      [req.user?.userId]
-    );
-    res.json(result.rows);
+    const entries = await db.query.journal_entries.findMany({
+      where: eq(journal_entries.user_id, req.user!.id),
+      orderBy: (entries, { desc }) => [desc(entries.created_at)]
+    });
+    res.json(entries);
   } catch (error) {
     console.error('Error fetching journal entries:', error);
     res.status(500).json({ message: 'Server error' });
@@ -25,16 +21,18 @@ router.get('/', auth, async (req: AuthRequest, res) => {
 });
 
 // Create a new journal entry
-router.post('/', auth, async (req: AuthRequest, res) => {
+router.post('/', authenticateToken, async (req, res) => {
   try {
     const { title, content, location } = req.body;
-    const entry_text = `${title}\n\n${content}${location ? `\n\nLocation: ${location}` : ''}`;
     
-    const result = await pool.query(
-      'INSERT INTO journal_entries (user_id, entry_text) VALUES ($1, $2) RETURNING *',
-      [req.user?.userId, entry_text]
-    );
-    res.status(201).json(result.rows[0]);
+    const [newEntry] = await db.insert(journal_entries).values({
+      user_id: req.user!.id,
+      title,
+      content,
+      location
+    }).returning();
+
+    res.status(201).json(newEntry);
   } catch (error) {
     console.error('Error creating journal entry:', error);
     res.status(500).json({ message: 'Server error', error: error instanceof Error ? error.message : 'Unknown error' });
@@ -42,18 +40,20 @@ router.post('/', auth, async (req: AuthRequest, res) => {
 });
 
 // Get a specific journal entry
-router.get('/:id', auth, async (req: AuthRequest, res) => {
+router.get('/:id', authenticateToken, async (req, res) => {
   try {
-    const result = await pool.query(
-      'SELECT * FROM journal_entries WHERE id = $1 AND user_id = $2',
-      [req.params.id, req.user?.userId]
-    );
+    const entry = await db.query.journal_entries.findFirst({
+      where: (entries, { and, eq }) => and(
+        eq(entries.id, parseInt(req.params.id)),
+        eq(entries.user_id, req.user!.id)
+      )
+    });
 
-    if (result.rows.length === 0) {
+    if (!entry) {
       return res.status(404).json({ message: 'Journal entry not found' });
     }
 
-    res.json(result.rows[0]);
+    res.json(entry);
   } catch (error) {
     console.error('Error fetching journal entry:', error);
     res.status(500).json({ message: 'Server error' });
@@ -61,21 +61,28 @@ router.get('/:id', auth, async (req: AuthRequest, res) => {
 });
 
 // Update a journal entry
-router.put('/:id', auth, async (req: AuthRequest, res) => {
+router.put('/:id', authenticateToken, async (req, res) => {
   try {
     const { title, content, location } = req.body;
-    const entry_text = `${title}\n\n${content}${location ? `\n\nLocation: ${location}` : ''}`;
     
-    const result = await pool.query(
-      'UPDATE journal_entries SET entry_text = $1 WHERE id = $2 AND user_id = $3 RETURNING *',
-      [entry_text, req.params.id, req.user?.userId]
-    );
+    const [updatedEntry] = await db.update(journal_entries)
+      .set({
+        title,
+        content,
+        location,
+        updated_at: new Date()
+      })
+      .where((entries, { and, eq }) => and(
+        eq(entries.id, parseInt(req.params.id)),
+        eq(entries.user_id, req.user!.id)
+      ))
+      .returning();
 
-    if (result.rows.length === 0) {
+    if (!updatedEntry) {
       return res.status(404).json({ message: 'Journal entry not found' });
     }
 
-    res.json(result.rows[0]);
+    res.json(updatedEntry);
   } catch (error) {
     console.error('Error updating journal entry:', error);
     res.status(500).json({ message: 'Server error', error: error instanceof Error ? error.message : 'Unknown error' });
@@ -83,14 +90,16 @@ router.put('/:id', auth, async (req: AuthRequest, res) => {
 });
 
 // Delete a journal entry
-router.delete('/:id', auth, async (req: AuthRequest, res) => {
+router.delete('/:id', authenticateToken, async (req, res) => {
   try {
-    const result = await pool.query(
-      'DELETE FROM journal_entries WHERE id = $1 AND user_id = $2 RETURNING *',
-      [req.params.id, req.user?.userId]
-    );
+    const [deletedEntry] = await db.delete(journal_entries)
+      .where((entries, { and, eq }) => and(
+        eq(entries.id, parseInt(req.params.id)),
+        eq(entries.user_id, req.user!.id)
+      ))
+      .returning();
 
-    if (result.rows.length === 0) {
+    if (!deletedEntry) {
       return res.status(404).json({ message: 'Journal entry not found' });
     }
 
