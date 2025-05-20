@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
 import { db } from '../db';
-import { users, rvs } from '../schema';
-import { eq } from 'drizzle-orm';
+import { users, rvs, tow_vehicles } from '../schema';
+import { eq, desc } from 'drizzle-orm';
+import bcrypt from 'bcrypt';
 
 // Get all users
 export const getAllUsers = async (req: Request, res: Response) => {
@@ -52,39 +53,63 @@ export const userController = {
   async getProfile(req: Request, res: Response) {
     try {
       const userId = req.user?.id;
+      console.log('Fetching profile for user ID:', userId);
+      
       if (!userId) {
+        console.log('No user ID found in request');
         return res.status(401).json({ error: 'Unauthorized' });
       }
 
+      // Get user data
+      console.log('Fetching user data...');
       const user = await db.query.users.findFirst({
-        where: eq(users.id, userId),
-        columns: {
-          id: true,
-          email: true,
-          username: true,
-          display_name: true,
-          bio: true,
-          created_at: true
-        }
+        where: eq(users.id, userId)
       });
 
       if (!user) {
+        console.log('User not found in database');
         return res.status(404).json({ error: 'User not found' });
       }
+      console.log('User data found:', { id: user.id, email: user.email });
 
       // Get user's RVs
+      console.log('Fetching user RVs...');
       const userRVs = await db.query.rvs.findMany({
         where: eq(rvs.user_id, userId),
         orderBy: (rvs, { desc }) => [desc(rvs.is_current), desc(rvs.created_at)]
       });
+      console.log('Found RVs:', userRVs.length);
 
-      res.json({
-        ...user,
-        rvs: userRVs
+      // Get user's tow vehicles
+      console.log('Fetching user tow vehicles...');
+      const userTowVehicles = await db.query.tow_vehicles.findMany({
+        where: eq(tow_vehicles.user_id, userId),
+        orderBy: (tow_vehicles, { desc }) => [desc(tow_vehicles.is_current), desc(tow_vehicles.created_at)]
       });
+      console.log('Found tow vehicles:', userTowVehicles.length);
+
+      // Remove sensitive data and combine results
+      const { password_hash, ...userData } = user;
+      const profile = {
+        ...userData,
+        rvs: userRVs,
+        tow_vehicles: userTowVehicles
+      };
+
+      console.log('Sending profile response');
+      res.json(profile);
     } catch (error) {
-      console.error('Error fetching user profile:', error);
-      res.status(500).json({ error: 'Server error fetching profile' });
+      console.error('Error in getProfile:', error);
+      if (error instanceof Error) {
+        console.error('Error details:', {
+          message: error.message,
+          stack: error.stack
+        });
+      }
+      res.status(500).json({ 
+        error: 'Server error fetching profile',
+        details: process.env.NODE_ENV === 'development' ? error instanceof Error ? error.message : 'Unknown error' : undefined
+      });
     }
   },
 

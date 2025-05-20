@@ -5,6 +5,8 @@ import rateLimit from 'express-rate-limit';
 import authRoutes from './routes/auth';
 import journalRoutes from './routes/journal';
 import userRoutes from './routes/user';
+import towVehicleRoutes from './routes/towVehicle';
+import rvRoutes from './routes/rv';
 
 dotenv.config();
 
@@ -26,6 +28,8 @@ app.use(limiter);
 app.use('/api/auth', authRoutes);
 app.use('/api/journal', journalRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/tow-vehicles', towVehicleRoutes);
+app.use('/api/rvs', rvRoutes);
 
 // Health check endpoint
 app.get('/health', (req: Request, res: Response) => {
