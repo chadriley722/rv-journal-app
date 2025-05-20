@@ -2,6 +2,12 @@
 
 A web application for RV enthusiasts to track their journeys and experiences.
 
+## Product Requirements
+
+For detailed product requirements and project roadmap, see the [Product Requirements Document (PRD)](docs/PRD.md).
+
+## Project Structure
+
 ## Project Structure
 
 - **backend/**: Node.js/Express backend with PostgreSQL database.
