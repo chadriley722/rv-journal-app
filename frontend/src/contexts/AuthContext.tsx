@@ -1,17 +1,19 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { apiClient, withErrorHandling } from '../utils/api';
 
 interface User {
   id: string;
   email: string;
-  username: string; // Assuming username is part of the User type
+  username: string;
+  name: string;
 }
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
-  isLoading: boolean; // Add loading state
+  isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, name: string) => Promise<void>; // Assuming registration needs name
+  register: (email: string, password: string, name: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -19,105 +21,74 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true); // Initialize loading as true
+  const [isLoading, setIsLoading] = useState(true);
   const isAuthenticated = !!user;
 
   useEffect(() => {
     const checkAuth = async () => {
-      // Check if a token exists in local storage
-      const token = localStorage.getItem('token');
-      console.log('AuthContext useEffect: Checking for token in localStorage', token ? 'Token found' : 'No token');
-
-      if (!token) {
-        // No token, user is not logged in. Do not attempt to fetch profile.
-        setUser(null);
-        setIsLoading(false); // Set loading to false if no token
-        return;
-      }
-
       try {
-        // Attempt to fetch user profile with the token
-        console.log('AuthContext useEffect: Attempting to fetch user profile with token');
-        const response = await fetch('/api/users/me', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        });
+        const token = localStorage.getItem('token');
+        if (!token) {
+          setUser(null);
+          setIsLoading(false);
+          return;
+        }
 
-        console.log('AuthContext useEffect: User profile fetch response status:', response.status);
-        if (response.ok) {
-          const userData = await response.json();
-          console.log('AuthContext useEffect: User data fetched successfully', userData);
-          setUser(userData);
+        // Verify token
+        const response = await apiClient.get('/auth/verify');
+        if (response.data.valid) {
+          setUser(response.data.user);
         } else {
-          // Token might be invalid or expired, clear storage and set user to null
           localStorage.removeItem('token');
           setUser(null);
-          console.error('Failed to fetch user profile with token', response.status);
         }
       } catch (error) {
-        console.error('Error checking auth status:', error);
-        // On error, assume not authenticated and clear token
         localStorage.removeItem('token');
         setUser(null);
       } finally {
-        setIsLoading(false); // Set loading to false after check
+        setIsLoading(false);
       }
     };
 
     checkAuth();
-  }, []); // Empty dependency array means this runs once on mount
+  }, []);
 
   const login = async (email: string, password: string) => {
-    setIsLoading(true); // Set loading on login attempt
+    setIsLoading(true);
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Login failed');
-      }
-
-      const result = await response.json();
-      localStorage.setItem('token', result.token); // Store the token
-      setUser(result.user); // Set user data
+      const response = await withErrorHandling(
+        apiClient.post('/auth/login', { email, password }),
+        'Login successful',
+        'Login failed'
+      );
+      
+      const { token, user } = response.data;
+      localStorage.setItem('token', token);
+      setUser(user);
     } finally {
-      setIsLoading(false); // Set loading to false after login attempt
+      setIsLoading(false);
     }
   };
 
   const register = async (email: string, password: string, name: string) => {
-    setIsLoading(true); // Set loading on register attempt
+    setIsLoading(true);
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password, name }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Registration failed');
-      }
-
-      const result = await response.json();
-      localStorage.setItem('token', result.token); // Store the token
-      setUser(result.user); // Set user data
+      const response = await withErrorHandling(
+        apiClient.post('/auth/register', { email, password, name }),
+        'Registration successful',
+        'Registration failed'
+      );
+      
+      const { token, user } = response.data;
+      localStorage.setItem('token', token);
+      setUser(user);
     } finally {
-      setIsLoading(false); // Set loading to false after register attempt
+      setIsLoading(false);
     }
   };
 
   const logout = () => {
-    localStorage.removeItem('token'); // Remove the token
+    localStorage.removeItem('token');
     setUser(null);
   };
 

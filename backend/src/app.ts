@@ -1,7 +1,9 @@
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import rateLimit from 'express-rate-limit';
+import { loginLimiter, apiLimiter } from './middleware/rateLimit';
+import { errorHandler } from './middleware/errorHandler';
+import { logger } from './utils/logger';
 import authRoutes from './routes/auth';
 import journalRoutes from './routes/journal';
 import userRoutes from './routes/user';
@@ -13,43 +15,57 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
-});
-
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || '*',
+  credentials: true,
+}));
 app.use(express.json());
-app.use(limiter);
+
+// Apply rate limiting
+app.use('/api/auth/login', loginLimiter);
+app.use('/api', apiLimiter);
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/journal', journalRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/journal', journalRoutes);
 app.use('/api/tow-vehicles', towVehicleRoutes);
 app.use('/api/rvs', rvRoutes);
 
 // Health check endpoint
 app.get('/health', (req: Request, res: Response) => {
+  logger.info('Health check successful');
   res.json({ status: 'ok' });
 });
 
 // Error handling middleware
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error(err.stack);
-  res.status(500).json({
-    error: 'Something went wrong!',
-    message: process.env.NODE_ENV === 'development' ? err.message : undefined
-  });
-});
+app.use(errorHandler);
 
 // 404 handler
 app.use((req: Request, res: Response) => {
+  logger.warn(`404: ${req.method} ${req.path}`);
   res.status(404).json({ error: 'Not Found' });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-}); 
+// Server start
+const server = app.listen(PORT, () => {
+  logger.info(`Server is running on http://localhost:${PORT}`);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  logger.info('SIGTERM signal received: closing HTTP server');
+  server.close(() => {
+    logger.info('HTTP server closed');
+    process.exit(0);
+  });
+});
+
+process.on('SIGINT', () => {
+  logger.info('SIGINT signal received: closing HTTP server');
+  server.close(() => {
+    logger.info('HTTP server closed');
+    process.exit(0);
+  });
+});
