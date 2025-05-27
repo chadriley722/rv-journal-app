@@ -1,0 +1,97 @@
+<!-- Dashboard for authenticated users -->
+<div class="container-fluid">
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h2 class="card-title">Welcome, <%= current_user.first_name %></h2>
+          <p class="lead">Your RV Journal Dashboard</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard stats and quick actions -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card text-white bg-primary mb-3">
+        <div class="card-body text-center">
+          <h5 class="card-title">RVs</h5>
+          <p class="display-4 fw-bold">0</p>
+          <%= link_to "Add RV", "#", class: "btn btn-sm btn-light" %>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-white bg-success mb-3">
+        <div class="card-body text-center">
+          <h5 class="card-title">Journal Entries</h5>
+          <p class="display-4 fw-bold">0</p>
+          <%= link_to "New Entry", "#", class: "btn btn-sm btn-light" %>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-white bg-info mb-3">
+        <div class="card-body text-center">
+          <h5 class="card-title">Maintenance Tasks</h5>
+          <p class="display-4 fw-bold">0</p>
+          <%= link_to "Record Maintenance", "#", class: "btn btn-sm btn-light" %>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-white bg-warning mb-3">
+        <div class="card-body text-center">
+          <h5 class="card-title">Upcoming Tasks</h5>
+          <p class="display-4 fw-bold">0</p>
+          <%= link_to "View Schedule", "#", class: "btn btn-sm btn-light" %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activity -->
+  <div class="row">
+    <div class="col-md-8">
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+          <h5 class="mb-0">Recent Activity</h5>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-info">
+            <p class="mb-0">You don't have any recent activity yet. Get started by adding an RV or creating your first journal entry!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="col-md-4">
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+          <h5 class="mb-0">Quick Links</h5>
+        </div>
+        <div class="card-body">
+          <div class="list-group">
+            <%= link_to "#", class: "list-group-item list-group-item-action d-flex justify-content-between align-items-center" do %>
+              <span>My RVs</span>
+              <span class="badge bg-primary rounded-pill">0</span>
+            <% end %>
+            <%= link_to "#", class: "list-group-item list-group-item-action d-flex justify-content-between align-items-center" do %>
+              <span>Journal Entries</span>
+              <span class="badge bg-primary rounded-pill">0</span>
+            <% end %>
+            <%= link_to "#", class: "list-group-item list-group-item-action d-flex justify-content-between align-items-center" do %>
+              <span>Maintenance Records</span>
+              <span class="badge bg-primary rounded-pill">0</span>
+            <% end %>
+            <%= link_to edit_user_registration_path, class: "list-group-item list-group-item-action" do %>
+              <span>Edit Profile</span>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

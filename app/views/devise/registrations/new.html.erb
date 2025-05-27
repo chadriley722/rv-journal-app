@@ -1,0 +1,57 @@
+<h2>Sign up</h2>
+
+<div class="card shadow-sm mb-4">
+  <div class="card-body">
+    <%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
+      <%= render "devise/shared/error_messages", resource: resource %>
+      
+      <div class="row g-3 mb-4">
+        <div class="col-md-6">
+          <div class="form-floating">
+            <%= f.text_field :first_name, class: "form-control", placeholder: "First name" %>
+            <%= f.label :first_name %>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-floating">
+            <%= f.text_field :last_name, class: "form-control", placeholder: "Last name" %>
+            <%= f.label :last_name %>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-floating mb-3">
+        <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "form-control", placeholder: "Email" %>
+        <%= f.label :email %>
+      </div>
+      
+      <div class="form-floating mb-3">
+        <%= f.text_field :location, class: "form-control", placeholder: "Location" %>
+        <%= f.label :location, "Location (City, State)" %>
+      </div>
+      
+      <div class="mb-3">
+        <%= f.label :bio, class: "form-label" %>
+        <%= f.text_area :bio, class: "form-control", rows: 3, placeholder: "Tell us a bit about yourself and your RV experience..." %>
+      </div>
+
+      <div class="form-floating mb-3">
+        <%= f.password_field :password, autocomplete: "new-password", class: "form-control", placeholder: "Password" %>
+        <%= f.label :password %>
+        <% if @minimum_password_length %>
+        <div class="form-text"><%= @minimum_password_length %> characters minimum</div>
+        <% end %>
+      </div>
+
+      <div class="form-floating mb-4">
+        <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "form-control", placeholder: "Password confirmation" %>
+        <%= f.label :password_confirmation %>
+      </div>
+
+      <div class="d-grid gap-2">
+        <%= f.submit "Sign up", class: "btn btn-primary btn-lg" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+<%= render "devise/shared/links" %>
