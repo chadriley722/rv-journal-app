@@ -4,8 +4,73 @@
     <div class="col-md-12">
       <div class="card shadow-sm">
         <div class="card-body">
-          <h2 class="card-title">Welcome, <%= current_user.first_name %></h2>
+          <h2 class="card-title">Welcome, <%= current_user.username %></h2>
           <p class="lead">Your RV Journal Dashboard</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RV Section -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card shadow-sm mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h3 class="h5 mb-0">
+            <% if current_user.has_rv? %>
+              My RV
+              <small class="text-muted">(<%= current_user.rvs.count %>)</small>
+            <% else %>
+              My RV
+            <% end %>
+          </h3>
+          <%= link_to current_user.has_rv? ? 'Add Another RV' : 'Add RV', new_rv_path, class: 'btn btn-primary btn-sm' %>
+        </div>
+        <div class="card-body">
+          <% if current_user.has_rv? %>
+            <% current_user.rvs.each do |rv| %>
+              <div class="rv-item p-3 mb-3 border rounded">
+                <div class="card mb-4">
+                  <% if rv.image.attached? %>
+                    <div class="card-img-top" style="height: 225px; overflow: hidden; background: #f8f9fa;">
+                      <%= image_tag rails_blob_path(rv.image, disposition: 'inline'), 
+                          class: 'img-fluid w-100 h-100', 
+                          style: 'object-fit: cover;' %>
+                    </div>
+                  <% end %>
+                  <div class="card-body">
+                    <h5 class="card-title"><%= rv.name %></h5>
+                    <% if rv.year.present? || rv.brand.present? || rv.model.present? %>
+                      <p class="card-text text-muted mb-1">
+                        <%= [rv.year, rv.brand, rv.model].reject(&:blank?).join(' · ') %>
+                      </p>
+                    <% end %>
+                    <% if rv.length.present? %>
+                      <p class="text-muted mb-0">
+                        <%= [rv.rv_class, ("#{rv.length} ft" if rv.length.present?)].reject(&:blank?).join(' · ') %>
+                      </p>
+                    <% end %>
+                    <div class="mt-3">
+                      <%= link_to 'Edit', edit_rv_path(rv), class: 'btn btn-sm btn-outline-primary' %>
+                      <%= button_to 'Remove', rv_path(rv), method: :delete, 
+                                  data: { confirm: 'Are you sure you want to remove this RV?' }, 
+                                  class: 'btn btn-sm btn-outline-danger' %>
+                    </div>
+                  </div>
+                </div>
+                <% if rv.description.present? %>
+                  <div class="mt-2 pt-2 border-top">
+                    <p class="mb-0"><%= rv.description %></p>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+          <% else %>
+            <div class="text-center py-4">
+              <p class="text-muted mb-4">You haven't added any RVs yet.</p>
+              <%= link_to 'Add Your First RV', new_rv_path, class: 'btn btn-primary' %>
+            </div>
+          <% end %>
         </div>
       </div>
     </div>
@@ -13,16 +78,7 @@
 
   <!-- Dashboard stats and quick actions -->
   <div class="row mb-4">
-    <div class="col-md-3">
-      <div class="card text-white bg-primary mb-3">
-        <div class="card-body text-center">
-          <h5 class="card-title">RVs</h5>
-          <p class="display-4 fw-bold">0</p>
-          <%= link_to "Add RV", "#", class: "btn btn-sm btn-light" %>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3">
+    <div class="col-md-4">
       <div class="card text-white bg-success mb-3">
         <div class="card-body text-center">
           <h5 class="card-title">Journal Entries</h5>
@@ -31,7 +87,7 @@
         </div>
       </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-4">
       <div class="card text-white bg-info mb-3">
         <div class="card-body text-center">
           <h5 class="card-title">Maintenance Tasks</h5>
@@ -40,7 +96,7 @@
         </div>
       </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-4">
       <div class="card text-white bg-warning mb-3">
         <div class="card-body text-center">
           <h5 class="card-title">Upcoming Tasks</h5>

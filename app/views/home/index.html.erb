@@ -1,14 +1,54 @@
-<div class="px-4 pt-5 my-5 text-center border-bottom">
-  <h1 class="display-4 fw-bold text-primary">Track Your RV Journey</h1>
-  <div class="col-lg-6 mx-auto">
-    <p class="lead mb-4">
-      Welcome to RV Journal - your comprehensive companion for tracking maintenance, documenting travels, and managing all aspects of your RV lifestyle.
-    </p>
-    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mb-5">
-      <%= link_to "Sign Up", new_user_registration_path, class: "btn btn-primary btn-lg px-4 me-sm-3" %>
-      <%= link_to "Log In", new_user_session_path, class: "btn btn-outline-secondary btn-lg px-4" %>
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <!-- Login Form Column -->
+    <div class="col-lg-5 col-md-8">
+      <div class="card shadow-sm">
+        <div class="card-body p-5">
+          <h2 class="text-center mb-4">Welcome Back</h2>
+          
+          <form action="/login" method="post" class="needs-validation" novalidate>
+            <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+            
+            <div class="form-floating mb-3">
+              <input type="email" name="user[email]" id="user_email" class="form-control form-control-lg" placeholder="Email" autofocus="autofocus" autocomplete="email" required>
+              <label for="user_email">Email</label>
+            </div>
+
+            <div class="form-floating mb-3">
+              <input type="password" name="user[password]" id="user_password" class="form-control form-control-lg" placeholder="Password" autocomplete="current-password" required>
+              <label for="user_password">Password</label>
+            </div>
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary btn-lg">Log in</button>
+            </div>
+            
+            <div class="text-center mt-3">
+              <a href="/users/password/new" class="text-decoration-none">Forgot your password?</a>
+            </div>
+            <hr class="my-4">
+            
+            <div class="text-center">
+              <p class="mb-0">Don't have an account? <a href="/register" class="text-decoration-none fw-bold">Sign up</a></p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Welcome Text Column -->
+    <div class="col-lg-7 ps-lg-5 mt-5 mt-lg-0">
+      <h1 class="display-4 fw-bold text-primary mb-4">Track Your RV Journey</h1>
+      <p class="lead mb-4">
+        Welcome to RV Journal - your comprehensive companion for tracking maintenance, documenting travels, and managing all aspects of your RV lifestyle.
+      </p>
+      <div class="d-grid gap-3 d-sm-flex">
+        <%= link_to "Create an account", new_user_registration_path, class: "btn btn-outline-primary btn-lg px-4" %>
+        <%= link_to "Learn more", "#features", class: "btn btn-link btn-lg px-4" %>
+      </div>
     </div>
   </div>
+</div>
   <div class="overflow-hidden">
     <div class="container px-5">
       <img src="https://images.unsplash.com/photo-1506126383447-1baf4fb3c8ca?q=80&w=1170" class="img-fluid border rounded-3 shadow-lg mb-4" alt="RV on the road" width="700" height="500" loading="lazy">

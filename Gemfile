@@ -55,6 +55,7 @@ gem "redis", ">= 4.0.1"
 
 # Image processing for Active Storage
 gem "image_processing", "~> 1.2"
+gem "mini_magick"  # For image processing with ImageMagick
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]

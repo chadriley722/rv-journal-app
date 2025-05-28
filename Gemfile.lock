@@ -509,6 +509,7 @@ DEPENDENCIES
   jbuilder
   kaminari (~> 1.2)
   lol_dba (~> 2.4)
+  mini_magick
   mocha (~> 2.1)
   pg (~> 1.1)
   pg_search (~> 2.3)

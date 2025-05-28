@@ -4,6 +4,9 @@ Rails.application.routes.draw do
     sign_in: 'login',
     sign_out: 'logout',
     sign_up: 'register'
+  }, controllers: {
+    registrations: 'registrations',
+    sessions: 'sessions'
   }
   
   # Root route
@@ -19,6 +22,9 @@ Rails.application.routes.draw do
   # RV management routes (to be implemented)
   resources :rvs do
     resources :maintenance_records, shallow: true
+    member do
+      patch :remove_image
+    end
   end
   
   # Journal entry routes (to be implemented)
